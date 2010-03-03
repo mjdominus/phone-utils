@@ -1,0 +1,20 @@
+
+There should be a filter program
+
+        phone-service command args...
+
+the job of phone-service is simple to interface to the mail system.
+it will read an email message from stdin, discard the headers (except
+for the subject, possibly) and send it to the command.  The command is
+a simple filter.  phone-service will receive the command's stdout and
+route it back to the mail system.
+
+There will also be a dispatcher program
+
+        phone-dispatch [ -f config ]
+
+which reads the message and the config file and then passes the
+message to some command as specified in the config file.  Typically
+the commands in the config file will be invocations of phone-service.
+
+
