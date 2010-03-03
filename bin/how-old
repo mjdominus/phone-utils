@@ -1,0 +1,58 @@
+#!/usr/bin/perl
+
+use Date::Calc 'Delta_Days';
+open L, ">>", "/tmp/$ENV{RECIPIENT}.log";
+
+sub Log {
+  print L time(), " $$ @_\n";
+}
+Log("Starting");
+
+my $reply_to = 'mjd-cell@plover.com';
+# my $reply_to = 'mjd-x@plover.com';
+my $bounce = 'mjd-info-bounce@plover.com';
+my $max_reply_len = 140;
+
+discard_header();
+chomp(my $bd = lc <>);
+Log("Birthdate = '$bd'");
+exit unless $bd =~ /^\d{8}$/;
+$subject = "Age for $bd\b";
+my ($ay, $am, $ad) = unpack "A4 A2 A2", $bd;
+my ($by, $bm, $bd) = (localtime())[5,4,3];
+my $days = Delta_Days($ay, $am, $ad, $ay, $bm+1, $bd);
+$days += 365 if $days < 0;
+my $years = int($days / 365);
+$days -= $years * 365;
+
+@dates = ([]) x 365;
+for $denom (2..365) {
+  for $num (1..$denom-1) {
+    my $day = $num * 365/$denom;
+    next if $dates[$day][0];
+    $dates[$day][0] = "$num/$denom";
+  }
+}
+
+$reply = "$years + $dates[$days][0]\n";
+Log("Reply = $reply");
+if (-t STDOUT) { 
+  open M, ">&=", *STDOUT;
+} else {
+  open M, "|/var/qmail/bin/qmail-inject -f $bounce $reply_to" or die $!;
+}
+print M "Subject: $subject\n";
+print M "To: Mark Dominus Phone <$reply_to>\n";
+print M "From: Plover.Com useless information service <$ENV{RECIPIENT}>\n";
+print M "\n";
+print M $reply, "\n";
+close M or die $!;
+
+sub discard_header {
+  return if -t STDOUT;
+  while (<>) {
+    chomp;
+    return if $_ eq "";
+  }
+}
+

@@ -1,0 +1,85 @@
+#!/usr/bin/perl
+
+open L, ">>", "/tmp/$ENV{RECIPIENT}.log";
+
+sub Log {
+  print L time(), " $$ @_\n";
+}
+Log("Starting");
+
+my $dict = "/usr/share/dict/american-english";
+my $reply_to = 'mjd-cell@plover.com';
+# my $reply_to = 'mjd-x@plover.com';
+my $bounce = 'mjd-info-bounce@plover.com';
+my $max_reply_len = 140;
+
+discard_header();
+chomp(my $letters = lc <>);
+Log("Letters = '$letters'");
+exit unless $letters =~ /^[a-z]{3}$/;
+my $pat = join ".*", split //, $letters;
+
+open F, "<", $dict or die $!;
+my @words;
+while (<F>) {
+  chomp;
+  next if /[^a-z]/;
+  push @words, $_ if /$pat/o;
+}
+Log(@words + 0, "matched");
+my $subject = @words . " word(s) matched $letters";
+my $reply = "";
+@words = collapse(@words);
+while (@words && length($reply) + length($words[0]) + 1 < $max_reply_len) {
+  $reply .= shift @words;
+  $reply .= " ";
+}
+if ($reply eq "") {
+  $subject = "No matches for $letters";
+}
+Log("Reply = $reply");
+if (-t STDOUT) { 
+  open M, ">&=", *STDOUT;
+} else {
+  open M, "|/var/qmail/bin/qmail-inject -f $bounce $reply_to" or die $!;
+}
+print M "Subject: $subject\n";
+print M "To: Mark Dominus Phone <$reply_to>\n";
+print M "From: Plover.Com useless information service <$ENV{RECIPIENT}>\n";
+print M "\n";
+print M $reply, "\n";
+close M or die $!;
+
+sub discard_header {
+  return if -t STDOUT;
+  while (<>) {
+    chomp;
+    return if $_ eq "";
+  }
+}
+
+sub collapse {
+  my @w = @_;
+  return unless @w;
+#  return @w;
+  my @c = my $prev = shift @w;
+  while (my $cur = shift @w) {
+    my $abbr = $cur;
+    my $n = common_prefix($prev, $cur);
+    if ($n == length($prev)) {
+      substr($abbr, 0, $n) = "*";
+    } elsif ($n > 1) {
+      substr($abbr, 0, $n) = $n;
+    }
+    push @c, $abbr;
+    $prev = $cur;
+  }
+  return @c;
+}
+
+sub common_prefix {
+  my ($a, $b) = @_;
+  my $n = 0;
+  $n++ while substr($a, 0, $n) eq substr($b, 0, $n);
+  return $n-1;
+}

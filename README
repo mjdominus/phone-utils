@@ -4,6 +4,9 @@ that can be accessed by SMS.
 
 For example, my phone's alarm function is clumsy and unreliable.  So I
 have a service that receives an SMS requesting an alarm, and which
-delivers another SMS to the phone at the requested time.
+delivers another SMS to the phone at the requested time.  Well,
+actually I haven't written that one yet.
 
+bin/license-plate is an example of a working service.
+bin/how-old is an incomplete service.
 
