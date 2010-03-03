@@ -1,0 +1,9 @@
+My cell phone provider will gateway SMS messages to email and back
+again.  This is a library for writing services that run on my computer
+that can be accessed by SMS.
+
+For example, my phone's alarm function is clumsy and unreliable.  So I
+have a service that receives an SMS requesting an alarm, and which
+delivers another SMS to the phone at the requested time.
+
+
