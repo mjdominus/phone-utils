@@ -1,6 +1,7 @@
 
 package PhoneUtils::Dispatcher;
 use PhoneUtils::Dispatcher::Config;
+use Email::Simple;
 our $VERSION = "0.01";
 
 sub new {
@@ -17,6 +18,22 @@ sub default_config_file {
 }
 
 sub config_factory { "PhoneUtils::Dispatcher::Config" }
+
+sub read_message {
+  my $fh = shift;
+  my $text = do { local $/; <$fh> };
+  return Email::Simple->new($text);
+}
+
+sub match {
+  my $self = shift;
+  my $target = shift;
+}
+
+sub run_mailer {
+}
+
+
 
 
 1;
