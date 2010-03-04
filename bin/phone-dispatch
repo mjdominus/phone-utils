@@ -1,0 +1,28 @@
+#!/usr/bin/perl
+
+use PhoneUtils;
+use PhoneUtils::Dispatcher;
+use Getopt::Std;
+my %opt = (f => PhoneUtils::Dispatcher->default_config_file());
+usage() unless getopts('df:', \%opt);
+
+my $self = PhoneUtils::Dispatcher->new(Config => $opt{f},
+				       Debug => $opt{d},
+				      )
+  or die;
+
+my $email = $self->read_message(\*STDIN)
+  or die;
+
+my $subject = $email->get_header('Subject')
+  or die;
+
+my $command = $self->match($subject);
+
+my $mailer = $self->run_mailer();
+
+$command->execute($email)
+  or die;
+
+sub usage {
+}
