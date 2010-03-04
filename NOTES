@@ -13,8 +13,10 @@ There will also be a dispatcher program
 
         phone-dispatch [ -f config ]
 
-which reads the message and the config file and then passes the
-message to some command as specified in the config file.  Typically
-the commands in the config file will be invocations of phone-service.
+which reads the message subject and the config file and then passes
+the message to some command as specified in the config file, which has
+a bunch of patterns for the subject to match.  Typically the commands
+in the config file will be invocations of phone-service.
 
+----------------------------------------------------------------
 
