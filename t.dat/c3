@@ -1,0 +1,15 @@
+\w{3}\b	
+echo "license plates"
+
+(\d{4}|\d{8})\b
+echo "birthdates"
+
+at \d+(am|pm)?|in \d+(h|m|)
+echo "alarm"
+
+calc \d+(\.\d*)?
+echo "calculator"
+
+pow \d+(\.\d*)?
+echo "powers"
+

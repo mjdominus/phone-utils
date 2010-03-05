@@ -1,5 +1,5 @@
 
-use Test::More tests => 5 + 27*2 ;
+use Test::More tests => 5 + 27*2 + 2 + 2 * 35;
 
 use_ok("PhoneUtils::Dispatcher::Config");
 
@@ -42,7 +42,48 @@ for my $file (qw(tf tf-plus))
 }
 
 # Test behavior of plausible complete config file
+{
+  my $config =
+    PhoneUtils::Dispatcher::Config->new(File => "t.dat/c3");
+  ok($config);
+  my @e = $config->entries();
+  is(@e, 5);
 
+  my @resp = (undef, "license plates", "birthdates", "alarm",
+	      "calculator", "powers");
+
+  my %tests = (pxg => 1, PXG => 1, Xyz => 1,
+	         abcd => 0,
+	       19690402 => 2, "0402" => 2,
+	         1 => 0, 12 => 0, 12345 => 0, 123456 => 0, 1234567 => 0,
+	         123456789 => 0,
+	       "at 1" => 3, "at 12" => 3, "at 3pm" => 3,
+	       "at  1" => 3, "at  12" => 3, "at  3pm" => 3,
+	         "at " => 0, "at12" => 0,
+	       "in 13" => 3, "in 13m" => 3, "in 13h" => 3, "in   13h" => 3,
+  	         "in" => 0, "in m" => 0, 
+#	       "at 13h" => 0, 
+	       "in13h" => 0,
+	       "calc 1" => 4, "calc 1." => 4, "calc 1.1" => 4,
+	       "calc   1.12" => 4, "calc 1.12a" => 4,
+	         "calc" => 0, "calc " => 0, "calc .12" => 0,
+	      );
+
+ TEST:
+  for my $t (keys %tests) {
+    my $x = $tests{$t};
+    my $command = $config->match($t);
+    if ($x == 0) {  # we expect match failure here
+      ok(! defined $command, "subject $t");
+      warn $command->command if $t eq "at 13h";
+      ok(1);
+      next TEST;
+    }
+    my $ok = $command->execute("");
+    ok($ok);
+    is($command->output, "$resp[$x]\n", "subject $t");
+  }
+}
 
 sub bool_ok {
   my ($a, $x, $msg) = @_;
