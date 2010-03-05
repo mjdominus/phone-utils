@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-use PhoneUtils;
+# use PhoneUtils;
 use PhoneUtils::Dispatcher;
 use Getopt::Std;
 my %opt = (f => PhoneUtils::Dispatcher->default_config_file());
