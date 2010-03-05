@@ -19,10 +19,11 @@ my $subject = $email->get_header('Subject')
 
 my $command = $self->match($subject);
 
-my $mailer = $self->run_mailer();
+my $mailer_fh = $self->run_mailer();
 
-$command->execute($email)
+$command->execute($email, $mailer_fh)
   or die;
 
 sub usage {
+    die "Usage: $0 [-f config-file]\n";
 }

@@ -19,6 +19,8 @@ sub default_config_file {
 
 sub config_factory { "PhoneUtils::Dispatcher::Config" }
 
+sub config { $_[0]{Config} }
+
 sub read_message {
   my $fh = shift;
   my $text = do { local $/; <$fh> };
@@ -28,9 +30,14 @@ sub read_message {
 sub match {
   my $self = shift;
   my $target = shift;
+  return $self->config->match($target);
 }
 
 sub run_mailer {
+  my $self = shift;
+  open my($fh), '| /var/qmail/bin/qmail-inject mjd-cell@plover.com'
+    or die "Couldn't run mailer: $!; aborting";
+  return $fh;
 }
 
 
