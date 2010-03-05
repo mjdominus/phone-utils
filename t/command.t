@@ -1,6 +1,5 @@
 
 use Test::More tests => 4;
-use Email::Simple;
 my $text = "I like pie";
 
 use_ok("PhoneUtils::Command");

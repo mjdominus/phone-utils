@@ -12,7 +12,7 @@ sub new {
 
 sub load_config {
   my $self = shift;
-  my $file = $self->file;
+  my $file = $self->file or return;
 
   open my($fh), "<", $file
     or die "Couldn't open '$file': $!; aborting";
@@ -22,7 +22,7 @@ sub load_config {
 
 sub load_config_fh {
   my $self = shift;
-  my $file = $self->file;
+  my $fh = shift;
 
   while (1) {
     my $pat = $self->_line($fh) or last;
@@ -35,7 +35,7 @@ sub load_config_fh {
     $self->add_entry($pat, $self->command_factory->new($cmd));
   }
 
-  return;
+  return 1;
 }
 
 sub add_entry {
