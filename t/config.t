@@ -1,8 +1,9 @@
 
-use Test::More tests => 32;
+use Test::More tests => 5 + 27*2 ;
 
 use_ok("PhoneUtils::Dispatcher::Config");
 
+# Trivial tests with empty config table
 {
   my $config =
     PhoneUtils::Dispatcher::Config->new(File => "t.dat/empty-config");
@@ -13,9 +14,12 @@ use_ok("PhoneUtils::Dispatcher::Config");
   ok(! defined  $config->match("foo"));
 }
 
+# Nontrivial tests of command selection and dispatching
+# These two files are the same, but the second one has comments and white space
+for my $file (qw(tf tf-plus))
 {
   my $config =
-    PhoneUtils::Dispatcher::Config->new(File => "t.dat/tf");
+    PhoneUtils::Dispatcher::Config->new(File => "t.dat/$file");
   ok($config);
   my @e = $config->entries();
   is(@e, 2);
@@ -36,6 +40,9 @@ use_ok("PhoneUtils::Dispatcher::Config");
     ok(! $cmd, "search for 'b'");
   }
 }
+
+# Test behavior of plausible complete config file
+
 
 sub bool_ok {
   my ($a, $x, $msg) = @_;
