@@ -21,7 +21,7 @@ my $command = $self->match($subject);
 
 my $mailer_fh = $self->run_mailer();
 
-my $ok = $command->execute($email, $email->as_string);
+my $ok = $command->execute($email->as_string);
 die "Command " . $command->command . " exited with status " . 
     $command->status . "\n"
     unless $ok;
