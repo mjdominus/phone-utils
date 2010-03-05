@@ -6,7 +6,7 @@ use_ok("PhoneUtils::Dispatcher::Config");
 # Trivial tests with empty config table
 {
   my $config =
-    PhoneUtils::Dispatcher::Config->new(File => "t.dat/empty-config");
+    PhoneUtils::Dispatcher::Config->new(File => "t.dat/empty");
   ok($config);
   my @e = $config->entries();
   is(@e, 0);
