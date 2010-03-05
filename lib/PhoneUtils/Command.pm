@@ -17,6 +17,7 @@ sub execute {
 	$self->{WEXIT} = $?;
 	return $self->{WEXIT} == 0;
     } else { 			# child
+	open STDOUT, ">&", $out or die "couldn't dup: $!";
 	exec "/bin/sh", "-c", $self->command();
 	die "Couldn't exec @$self: $!\n";
     }
