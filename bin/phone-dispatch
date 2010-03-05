@@ -21,8 +21,15 @@ my $command = $self->match($subject);
 
 my $mailer_fh = $self->run_mailer();
 
-$command->execute($email, $mailer_fh)
-  or die;
+my $ok = $command->execute($email, $email->as_string);
+die "Command " . $command->command . " exited with status " . 
+    $command->status . "\n"
+    unless $ok;
+
+print {$mailer_fh} $command->output();
+close $mailer_fh or die "close: $!";
+
+exit 0;
 
 sub usage {
     die "Usage: $0 [-f config-file]\n";
