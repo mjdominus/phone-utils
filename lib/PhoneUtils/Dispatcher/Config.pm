@@ -30,6 +30,7 @@ sub load_config_fh {
       warn "Missing command for '$pat' at EOF";
       last;
     };
+    $pat =~ s/\s*$//;
     $pat =~ s/\s+/\\s+/g;
     $pat =~ s/^/^/;
     $self->add_entry($pat, $self->command_factory->new($cmd));
@@ -40,7 +41,7 @@ sub load_config_fh {
 
 sub add_entry {
   my ($self, $pat, $cmd) = @_;
-  push @{$self->{Entries}}, [ qr/$pat/, $cmd ];
+  push @{$self->{Entries}}, [ qr/$pat/i, $cmd ];
 }
 
 sub entries {
@@ -73,6 +74,9 @@ sub match {
   return;
 }
 
-sub command_factory { return "PhoneUtils::Command"; }
+sub command_factory {
+  require PhoneUtils::Command;
+  return "PhoneUtils::Command";
+}
 
 1;
