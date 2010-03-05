@@ -2,8 +2,8 @@
 package PhoneUtils::Command;
 
 sub new {
-    my ($class, $cmd, @args) = @_;
-    bless { CMD => $cmd, ARGS => \@args } => $class;
+    my ($class, $cmd) = @_;
+    bless { CMD => $cmd } => $class;
 }
 
 sub execute {
@@ -17,10 +17,12 @@ sub execute {
 	$self->{WEXIT} = $?;
 	return $self->{WEXIT} == 0;
     } else { 			# child
-	exec $self->{CMD}, @{$self->{ARGS}}
+	exec "/bin/sh", "-c", $self->command();
 	die "Couldn't exec @$self: $!\n";
     }
 }
+
+sub command { $_[0]{CMD} }
 
 1;
 
