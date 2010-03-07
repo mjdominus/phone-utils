@@ -22,7 +22,7 @@ sub config_factory { "PhoneUtils::Dispatcher::Config" }
 sub config { $_[0]{Config} }
 
 sub read_message {
-  my $fh = shift;
+  my ($self, $fh) = @_;
   my $text = do { local $/; <$fh> };
   return Email::Simple->new($text);
 }
