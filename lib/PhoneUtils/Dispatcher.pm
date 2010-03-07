@@ -10,6 +10,7 @@ sub new {
   my $conf_file = delete($args{Config}) || $self->default_config_file();
   $self->{Config} = $self->config_factory->new(File => $conf_file)
     or return;
+  $self->{Debug} = delete $args{Debug};
   return $self;
 }
 
@@ -20,6 +21,7 @@ sub default_config_file {
 sub config_factory { "PhoneUtils::Dispatcher::Config" }
 
 sub config { $_[0]{Config} }
+sub debug { $_[0]{Debug} }
 
 sub read_message {
   my ($self, $fh) = @_;
@@ -35,6 +37,7 @@ sub match {
 
 sub run_mailer {
   my $self = shift;
+  return \*STDOUT if $self->debug;
   open my($fh), '| /var/qmail/bin/qmail-inject mjd-cell@plover.com'
     or die "Couldn't run mailer: $!; aborting";
   return $fh;
