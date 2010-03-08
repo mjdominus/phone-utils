@@ -7,19 +7,32 @@ sub new {
     bless { CMD => $cmd } => $class;
 }
 
+sub ignoring_sigpipe (&) {
+  my $code = shift;
+  my $exc = ["SIGPIPE!"];
+  local $SIG{PIPE} = sub { die $exc };
+  my $res = eval { $code->() };
+  if ($@ && ref($@) eq "ARRAY" && $@ == $exc) { return 1; }  # OK
+  elsif ($@) { die; }
+  else { return $res; }
+}
+
 sub execute {
   my ($self, $input) = @_;
 
-  my ($from, $to);
-  my $pid = IPC::Open2::open2($from, $to, 
-			      "/bin/sh", "-c", $self->command());
+  my $cmd = $self->command();
 
-  print {$to} $input;
-  close $to;
+  my ($from, $to);
+  my $pid = IPC::Open2::open2($from, $to,
+			      "/bin/sh", "-c", $cmd);
+  ignoring_sigpipe {
+    print $to $input;
+    close $to;
+  };
 
   my $output = "";
   $output .= $_ while <$from>;
-  waitpid($pid, 0);
+  waitpid($pid, 0) or die "wait: $!";
   my $status = $self->{WEXITSTATUS} = $?;
   $self->{STATUS} = ($? >> 8);
   $self->{OUTPUT} = $output;
