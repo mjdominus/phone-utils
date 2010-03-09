@@ -14,8 +14,7 @@ my $self = PhoneUtils::Dispatcher->new(Config => $opt{f},
 my $email = $self->read_message(\*STDIN)
   or die;
 
-my $subject = $email->header('Subject')
-  or die;
+my ($subject) = $email->header('Subject') || ($email->body =~ /^(.*\S.*)$/m);
 
 my $command = $self->match($subject);
 
