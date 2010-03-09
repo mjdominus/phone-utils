@@ -1,0 +1,19 @@
+#!/usr/bin/perl
+
+use Astro::MoonPhase;
+use POSIX 'strftime';
+
+my $t = time() + shift();
+
+my ($MoonPhase) = sprintf "%.0f", phase($t);
+
+my @phaseDesc = qw(new 1stq full lastq);
+my ($phase, @times) = phaselist($t, $t + 30 * 86_400);
+
+print "Subject: The moon is $MoonPhase% full\n\n";
+print "($phaseDesc[$phase] moon)\n\n";
+for (0 .. $#times) {
+  print strftime($phaseDesc[($phase + 1 + $_) % 4] . ": %a %e %b\n",
+                 localtime($times[$_]));
+}
+
