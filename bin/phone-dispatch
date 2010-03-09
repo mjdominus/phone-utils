@@ -27,14 +27,13 @@ die "Command " . $command->command . " exited with status " .
     unless $ok;
 
 my $output = $command->output();
-warn "<<$output>>\n" if $self->debug;
 my $result = Email::Simple->new($output);
-if ($result->as_string eq "") {
+if ($result->as_string !~ /\S/) {
   $result->header_set('Subject' => substr($output, 0, 40));
   $result->body_set($output);
 }
 
-print {$mailer_fh} ">> ", $result->as_string();
+print {$mailer_fh} $result->as_string();
 close $mailer_fh or die "close: $!";
 
 exit 0;
